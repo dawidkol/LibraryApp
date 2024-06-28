@@ -1,5 +1,6 @@
 package pl.dk.libraryapp.book;
 
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,12 @@ class BookController {
     public ResponseEntity<BookDto> getBookById(@PathVariable String id) {
         BookDto optionBookDto = bookService.findBookById(id);
         return ResponseEntity.ok(optionBookDto);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody JsonMergePatch jsonMergePatch) {
+        bookService.updateBook(id, jsonMergePatch);
+        return ResponseEntity.noContent().build();
     }
 
 }

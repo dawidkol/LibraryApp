@@ -32,8 +32,8 @@ class BookControllerTest {
 
 
     @Test
-    @DisplayName("Test CRUD operations with Book")
-    void testCrudOperationsWithBook() throws Exception {
+    @DisplayName("Test CRUD operations for Book")
+    void testCrudOperationsForBook() throws Exception {
         // 1. User wants to add book to the database
         String bookJson = """
                 {
@@ -66,6 +66,19 @@ class BookControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/books/{id}", book.id()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+
+        // 3. User wants to update book
+        String jsonMergePatchString = """
+                {
+                    "title": "Effective Java - Updated",
+                    "author": "Addison-Wesley - Updated"
+                }
+                """;
+        mockMvc.perform(MockMvcRequestBuilders
+                        .patch("/books/{id}", book.id())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMergePatchString))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
     }
 
