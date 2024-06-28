@@ -3,8 +3,8 @@ spring:
     mongodb:
       database: library
       auto-index-creation: true
-      username: root
-      password: secret
-      authentication-database: admin
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
       port: 27017
       host: localhost
+      authentication-database: admin
