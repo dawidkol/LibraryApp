@@ -1,5 +1,6 @@
 package pl.dk.libraryapp.book;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -25,11 +27,14 @@ class BookControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     @Test
-    @DisplayName("It should add book to database")
-    void itShouldAddBookToDatabase() throws Exception {
-        // Given
+    @DisplayName("Test CRUD operations with Book")
+    void testCrudOperationsWithBook() throws Exception {
+        // 1. User wants to add book to the database
         String bookJson = """
                 {
                     "title": "Effective Java",
@@ -39,18 +44,29 @@ class BookControllerTest {
                 }
                 """.trim();
 
-        // When & Then
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders
                         .post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bookJson))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        String location = resultActions
+        MockHttpServletResponse response = resultActions
                 .andReturn()
-                .getResponse()
-                .getHeader("Location");
+                .getResponse();
+
+        String location = response.getHeader("Location");
 
         Assertions.assertNotNull(location);
+
+
+        // 2. User wants to find book by given id
+        String bookString = response.getContentAsString();
+        Book book = objectMapper.readValue(bookString, Book.class);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{id}", book.id()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+
     }
+
 }

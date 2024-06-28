@@ -8,6 +8,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pl.dk.libraryapp.book.dtos.BookDto;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +33,7 @@ class BookServiceTest {
 
 
     @Test
-    @DisplayName("It should save Book in database")
+    @DisplayName("It should save book in database")
     void itShouldSaveBookInDatabase() {
         // Given
         BookDto dto = BookDto.builder()
@@ -69,6 +71,36 @@ class BookServiceTest {
                 () -> assertEquals(bookDto.publisher(), dto.publisher()),
                 () -> assertEquals(bookDto.author(), dto.author())
         );
+    }
+
+    @Test
+    @DisplayName("It should find book by given id")
+    void itShouldFindBookByGivenId() {
+        // Given
+        String bookId = "1";
+
+        Book book = Book.builder()
+                .id(bookId)
+                .title("Effective Java")
+                .author("Joshua Bloch")
+                .publisher("Addison-Wesley")
+                .isbn("978-1-56619-909-4")
+                .build();
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        // When
+        BookDto bookById = underTest.findBookById(bookId);
+
+        // Then
+        assertAll(
+                () -> assertEquals(bookById.id(), bookId),
+                () -> assertEquals(bookById.title(), book.title()),
+                () -> assertEquals(bookById.author(), book.author()),
+                () -> assertEquals(bookById.publisher(), book.publisher()),
+                () -> assertEquals(bookById.isbn(), book.isbn())
+        );
+
     }
 }
 
