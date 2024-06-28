@@ -30,7 +30,6 @@ class BookControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     @Test
     @DisplayName("Test CRUD operations for Book")
     void testCrudOperationsForBook() throws Exception {
@@ -80,6 +79,10 @@ class BookControllerTest {
                         .content(jsonMergePatchString))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
+        // 4. User wants to delete book
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/books/{id}", book.id()))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
 }

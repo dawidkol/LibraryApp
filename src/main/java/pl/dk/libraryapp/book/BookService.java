@@ -49,5 +49,11 @@ class BookService {
         JsonNode bookDtoPatchedNode = jsonMergePatch.apply(jsonNode);
         return objectMapper.treeToValue(bookDtoPatchedNode, BookDto.class);
     }
+
+    @Transactional
+    public void deleteBookById(String id) {
+        bookRepository.findById(id)
+                .ifPresentOrElse(bookRepository::delete, () -> new BookNotFoundException("Book with id = %s not found".formatted(id)));
+    }
 }
 

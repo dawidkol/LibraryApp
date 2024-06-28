@@ -40,4 +40,10 @@ class BookController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBook(@PathVariable String id) {
+        bookService.deleteBookById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

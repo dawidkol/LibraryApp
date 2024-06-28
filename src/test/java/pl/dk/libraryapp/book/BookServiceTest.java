@@ -1,7 +1,6 @@
 package pl.dk.libraryapp.book;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import org.junit.jupiter.api.AfterEach;
@@ -148,6 +147,32 @@ class BookServiceTest {
                 () -> verify(bookRepository, times(1)).save(bookArgumentCaptor.capture()),
                 () -> assertEquals(bookArgumentCaptor.getValue().title(), "Effective Java - Updated"),
                 () -> assertEquals(bookArgumentCaptor.getValue().author(), "Addison-Wesley - Updated")
+        );
+    }
+
+    @Test
+    @DisplayName("It should delete book by given id")
+    void itShouldDeleteBookByGivenId() {
+        // Given
+        String bookId = "1";
+
+        Book book = Book.builder()
+                .id(bookId)
+                .title("Effective Java")
+                .author("Joshua Bloch")
+                .publisher("Addison-Wesley")
+                .isbn("978-1-56619-909-4")
+                .build();
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+
+        // When
+        underTest.deleteBookById(bookId);
+
+        // Then
+        assertAll(
+                () -> verify(bookRepository, times(1)).findById(bookId),
+                () -> verify(bookRepository, times(1)).delete(book)
         );
     }
 }
