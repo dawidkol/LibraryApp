@@ -35,7 +35,7 @@ class BookServiceTest {
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
-        underTest = new BookService(bookRepository, objectMapper);
+        underTest = new BookServiceImpl(bookRepository, objectMapper);
     }
 
     @AfterEach
@@ -196,6 +196,7 @@ class BookServiceTest {
     }
 
     @Test
+    @DisplayName("It should retrieve all books")
     void itShouldRetrieveAllBooks() {
         // Given
         int page = 1;
@@ -221,5 +222,51 @@ class BookServiceTest {
                () -> assertEquals(1, allBooks.size())
         );
     }
+
+    @Test
+    @DisplayName("It should find book by given ISBN")
+    void itShouldFindBookByGivenISBN() {
+        // Given
+        String ISBN = "978-1-56619-909-4";
+
+        Book book = Book.builder()
+                .id("1")
+                .title("Effective Java")
+                .author("Joshua Bloch")
+                .publisher("Addison-Wesley")
+                .isbn(ISBN)
+                .build();
+
+        when(bookRepository.findBookByIsbn(ISBN)).thenReturn(Optional.of(book));
+
+        // When
+        BookDto result = underTest.findBookByISBN(ISBN);
+
+        // Then
+        assertAll(
+                () -> verify(bookRepository, times(1)).findBookByIsbn(ISBN),
+                () -> assertEquals(book.id(), result.id()),
+                () -> assertEquals(book.title(), result.title()),
+                () -> assertEquals(book.author(), result.author()),
+                () -> assertEquals(book.publisher(), result.publisher()),
+                () -> assertEquals(book.isbn(), result.isbn())
+        );
+    }
+
+    @Test
+    @DisplayName("It should throw BookNotFoundException when user tries to find book with non existing ISBN")
+    void itShouldThrowBookNotFoundExceptionWhenUserTriesToFindBookWithNonExistingISBN() {
+        // Given
+        String ISBN = "978-1-56619-909-4";
+
+        when(bookRepository.findBookByIsbn(ISBN)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertAll(
+                () -> assertThrows(BookNotFoundException.class, () -> underTest.findBookByISBN(ISBN)),
+                () -> verify(bookRepository, times(1)).findBookByIsbn(ISBN)
+        );
+    }
+
 }
 

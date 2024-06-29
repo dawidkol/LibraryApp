@@ -34,7 +34,7 @@ class CustomerServiceTest {
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         objectMapper = new ObjectMapper();
-        underTest = new CustomerService(customerRepository, objectMapper);
+        underTest = new CustomerServiceImpl(customerRepository, objectMapper);
     }
 
     @AfterEach
