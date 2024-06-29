@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import pl.dk.libraryapp.book.dtos.BookDto;
+import pl.dk.libraryapp.book.dtos.BookInventoryDto;
 import pl.dk.libraryapp.book.exceptions.BookNotFoundException;
 
 import java.util.List;
@@ -213,7 +214,7 @@ class BookServiceTest {
         when(bookRepository.findAll(pageRequest)).thenReturn(pageImpl);
 
         // When
-        List<BookDto> allBooks = underTest.findAllBooks(page, size);
+        List<BookInventoryDto> allBooks = underTest.findAllBooks(page, size);
 
         // Then
         assertAll(

@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dk.libraryapp.book.dtos.BookDto;
+import pl.dk.libraryapp.book.dtos.BookInventoryDto;
 import pl.dk.libraryapp.book.exceptions.BookNotFoundException;
 import pl.dk.libraryapp.book.exceptions.ServerException;
 
@@ -61,11 +62,26 @@ class BookService {
                 });
     }
 
-    public List<BookDto> findAllBooks(int page, int size) {
+    public List<BookInventoryDto> findAllBooks(int page, int size) {
         return bookRepository.findAll(PageRequest.of(--page, size))
                 .stream()
-                .map(BookDtoMapper::map)
+                .map(this::mapToBookInventoryDto)
                 .toList();
+    }
+
+    private BookInventoryDto mapToBookInventoryDto(Book book) {
+        int bookQuantity = bookRepository.countAllByTitleAndAuthorAndPublisher(
+                book.title(),
+                book.author(),
+                book.publisher());
+
+        return BookInventoryDto.builder()
+                .id(book.id())
+                .title(book.title())
+                .author(book.author())
+                .publisher(book.publisher())
+                .quantity(bookQuantity)
+                .build();
     }
 
 }
