@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dk.libraryapp.book.dtos.BookDto;
 import pl.dk.libraryapp.book.dtos.BookInventoryDto;
-import pl.dk.libraryapp.book.exceptions.BookNotFoundException;
-import pl.dk.libraryapp.book.exceptions.ServerException;
+import pl.dk.libraryapp.exceptions.BookNotFoundException;
+import pl.dk.libraryapp.exceptions.ServerException;
 
 import java.util.List;
 

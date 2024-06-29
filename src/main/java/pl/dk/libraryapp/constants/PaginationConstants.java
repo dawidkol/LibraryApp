@@ -1,4 +1,4 @@
-package pl.dk.libraryapp.book.constants;
+package pl.dk.libraryapp.constants;
 
 public class PaginationConstants {
     public static final String PAGE_DEFAULT = "1";

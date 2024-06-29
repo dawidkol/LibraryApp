@@ -14,7 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import pl.dk.libraryapp.book.dtos.BookDto;
 import pl.dk.libraryapp.book.dtos.BookInventoryDto;
-import pl.dk.libraryapp.book.exceptions.BookNotFoundException;
+import pl.dk.libraryapp.exceptions.BookNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -186,7 +186,6 @@ class BookServiceTest {
     void itShouldThrowBookNotFoundExceptionWhenUserTriesToDeleteBookWithNonExistingId() {
         // Given
         String nonExistingId = "1";
-        when(bookRepository.findById(nonExistingId)).thenThrow(BookNotFoundException.class);
 
         // When & Then
         assertAll(

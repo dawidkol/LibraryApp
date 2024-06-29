@@ -14,8 +14,8 @@ import pl.dk.libraryapp.book.dtos.BookInventoryDto;
 import java.net.URI;
 import java.util.List;
 
-import static pl.dk.libraryapp.book.constants.PaginationConstants.PAGE_DEFAULT;
-import static pl.dk.libraryapp.book.constants.PaginationConstants.PAGE_SIZE_DEFAULT;
+import static pl.dk.libraryapp.constants.PaginationConstants.PAGE_DEFAULT;
+import static pl.dk.libraryapp.constants.PaginationConstants.PAGE_SIZE_DEFAULT;
 
 @RestController
 @RequestMapping("/books")

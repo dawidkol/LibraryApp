@@ -1,4 +1,4 @@
-package pl.dk.libraryapp.book.error;
+package pl.dk.libraryapp.error;
 
 import com.mongodb.MongoWriteException;
 import jakarta.validation.ConstraintViolationException;
