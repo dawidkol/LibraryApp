@@ -78,10 +78,10 @@ class BookServiceTest {
         // Then
         assertAll(
                 () -> assertNotNull(bookDto),
-                () -> assertEquals(bookDto.title(), dto.title()),
-                () -> assertEquals(bookDto.author(), dto.author()),
-                () -> assertEquals(bookDto.publisher(), dto.publisher()),
-                () -> assertEquals(bookDto.author(), dto.author()),
+                () -> assertEquals(dto.title(), bookDto.title()),
+                () -> assertEquals(dto.author(), bookDto.author()),
+                () -> assertEquals(dto.publisher(), bookDto.publisher()),
+                () -> assertEquals(dto.author(), bookDto.author()),
                 () -> verify(bookRepository, times(1)).save(book)
         );
     }
@@ -107,11 +107,11 @@ class BookServiceTest {
 
         // Then
         assertAll(
-                () -> assertEquals(bookById.id(), bookId),
-                () -> assertEquals(bookById.title(), book.title()),
-                () -> assertEquals(bookById.author(), book.author()),
-                () -> assertEquals(bookById.publisher(), book.publisher()),
-                () -> assertEquals(bookById.isbn(), book.isbn()),
+                () -> assertEquals(bookId, bookById.id()),
+                () -> assertEquals(book.title(), bookById.title()),
+                () -> assertEquals(book.author(), bookById.author()),
+                () -> assertEquals(book.publisher(), bookById.publisher()),
+                () -> assertEquals(book.isbn(), bookById.isbn()),
                 () -> verify(bookRepository, times(1)).findById(bookId)
         );
     }
@@ -150,8 +150,8 @@ class BookServiceTest {
         assertAll(
                 () -> verify(bookRepository, times(1)).findById(bookId),
                 () -> verify(bookRepository, times(1)).save(bookArgumentCaptor.capture()),
-                () -> assertEquals(bookArgumentCaptor.getValue().title(), "Effective Java - Updated"),
-                () -> assertEquals(bookArgumentCaptor.getValue().author(), "Addison-Wesley - Updated")
+                () -> assertEquals("Effective Java - Updated", bookArgumentCaptor.getValue().title()),
+                () -> assertEquals("Addison-Wesley - Updated", bookArgumentCaptor.getValue().author())
         );
     }
 
@@ -218,8 +218,8 @@ class BookServiceTest {
         // Then
         assertAll(
                 () -> verify(bookRepository, times(1)).findAll(pageRequest),
-                () -> assertEquals(pageImpl.getTotalElements(), books.size()),
-                () -> assertEquals(pageImpl.getTotalPages(), page)
+                () -> assertEquals(books.size(), pageImpl.getTotalElements()),
+                () -> assertEquals(page, pageImpl.getTotalPages())
         );
     }
 }
