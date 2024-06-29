@@ -10,8 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import pl.dk.libraryapp.book.dtos.BookDto;
+import pl.dk.libraryapp.book.exceptions.BookNotFoundException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -173,6 +177,49 @@ class BookServiceTest {
         assertAll(
                 () -> verify(bookRepository, times(1)).findById(bookId),
                 () -> verify(bookRepository, times(1)).delete(book)
+        );
+    }
+
+    @Test
+    @DisplayName("It should throw BookNotFoundException when user tries to delete book with non existing ID")
+    void itShouldThrowBookNotFoundExceptionWhenUserTriesToDeleteBookWithNonExistingId() {
+        // Given
+        String nonExistingId = "1";
+        when(bookRepository.findById(nonExistingId)).thenThrow(BookNotFoundException.class);
+
+        // When & Then
+        assertAll(
+                () -> assertThrows(BookNotFoundException.class, () -> underTest.deleteBookById(nonExistingId)),
+                () -> verify(bookRepository, times(1)).findById(nonExistingId)
+        );
+
+    }
+
+    @Test
+    void itShouldRetrieveAllBooks() {
+        // Given
+        int page = 1;
+        int size = 25;
+        Book book = Book.builder()
+                .id("1")
+                .title("Effective Java")
+                .author("Joshua Bloch")
+                .publisher("Addison-Wesley")
+                .isbn("978-1-56619-909-4")
+                .build();
+        List<Book> books = List.of(book);
+        PageImpl<Book> pageImpl = new PageImpl<>(books);
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+        when(bookRepository.findAll(pageRequest)).thenReturn(pageImpl);
+
+        // When
+        List<BookDto> allBooks = underTest.findAllBooks(page, size);
+
+        // Then
+        assertAll(
+                () -> verify(bookRepository, times(1)).findAll(pageRequest),
+                () -> assertEquals(pageImpl.getTotalElements(), books.size()),
+                () -> assertEquals(pageImpl.getTotalPages(), page)
         );
     }
 }

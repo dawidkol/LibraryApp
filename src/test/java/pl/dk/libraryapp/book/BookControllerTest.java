@@ -1,6 +1,7 @@
 package pl.dk.libraryapp.book;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,11 +53,8 @@ class BookControllerTest {
         MockHttpServletResponse response = resultActions
                 .andReturn()
                 .getResponse();
-
         String location = response.getHeader("Location");
-
         Assertions.assertNotNull(location);
-
 
         // 2. User wants to find book by given id
         String bookString = response.getContentAsString();
@@ -79,7 +77,14 @@ class BookControllerTest {
                         .content(jsonMergePatchString))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        // 4. User wants to delete book
+        // 4. User wants to retrieve all books
+        mockMvc.perform(MockMvcRequestBuilders.get("/books"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)));
+
+
+        // 5. User wants to delete book
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/books/{id}", book.id()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());

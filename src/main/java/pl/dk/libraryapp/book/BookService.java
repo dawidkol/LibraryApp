@@ -6,11 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dk.libraryapp.book.dtos.BookDto;
 import pl.dk.libraryapp.book.exceptions.BookNotFoundException;
 import pl.dk.libraryapp.book.exceptions.ServerException;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -53,7 +56,17 @@ class BookService {
     @Transactional
     public void deleteBookById(String id) {
         bookRepository.findById(id)
-                .ifPresentOrElse(bookRepository::delete, () -> new BookNotFoundException("Book with id = %s not found".formatted(id)));
+                .ifPresentOrElse(bookRepository::delete, () -> {
+                    throw new BookNotFoundException("Book with id = %s not found".formatted(id));
+                });
     }
+
+    public List<BookDto> findAllBooks(int page, int size) {
+        return bookRepository.findAll(PageRequest.of(--page, size))
+                .stream()
+                .map(BookDtoMapper::map)
+                .toList();
+    }
+
 }
 
