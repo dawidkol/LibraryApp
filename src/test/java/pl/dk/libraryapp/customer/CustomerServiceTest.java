@@ -1,9 +1,13 @@
 package pl.dk.libraryapp.customer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageImpl;
@@ -24,11 +28,13 @@ class CustomerServiceTest {
     private CustomerRepository customerRepository;
     private CustomerService underTest;
     private AutoCloseable autoCloseable;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        underTest = new CustomerService(customerRepository);
+        objectMapper = new ObjectMapper();
+        underTest = new CustomerService(customerRepository, objectMapper);
     }
 
     @AfterEach
@@ -162,7 +168,6 @@ class CustomerServiceTest {
         PageRequest pageRequest = PageRequest.of(page - 1, size);
         when(customerRepository.findAll(pageRequest)).thenReturn(pageImpl);
 
-
         // When
         List<CustomerDto> result = underTest.findAllCustomers(page, size);
 
@@ -170,5 +175,42 @@ class CustomerServiceTest {
         assertAll(
                 () -> verify(customerRepository, times(1)).findAll(pageRequest),
                 () -> assertEquals(1, result.size()));
+    }
+
+    @Test
+    @DisplayName("It should update Customer firstName ale lastName")
+    void itShouldUpdateCustomerFirstNameAndCustomerLastName() throws JsonProcessingException {
+        // Given
+        String customerId = "1";
+
+        Customer customer = Customer.builder()
+                .id("1")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@test.pl")
+                .build();
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(customerRepository.save(any(Customer.class))).thenReturn(any(Customer.class));
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+
+        String jsonMergePatchUpdate = """
+                {
+                "firstName": "John - updated",
+                "lastName": "Doe - updated"
+                }
+                """.trim();
+        JsonMergePatch jsonMergePatch = objectMapper.readValue(jsonMergePatchUpdate, JsonMergePatch.class);
+
+        // When
+        underTest.updateCustomer(customerId, jsonMergePatch);
+
+        // Then
+        assertAll(
+                () -> verify(customerRepository, times(1)).findById(customerId),
+                () -> verify(customerRepository, times(1)).save(customerArgumentCaptor.capture()),
+                () -> assertEquals("John - updated", customerArgumentCaptor.getValue().firstName()),
+                () -> assertEquals("Doe - updated", customerArgumentCaptor.getValue().lastName())
+        );
     }
 }

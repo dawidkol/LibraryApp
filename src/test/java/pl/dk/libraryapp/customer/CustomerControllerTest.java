@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.dk.libraryapp.TestcontainersConfiguration;
 import pl.dk.libraryapp.customer.dtos.CustomerDto;
 
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import(TestcontainersConfiguration.class)
@@ -66,5 +68,17 @@ class CustomerControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(Matchers.greaterThan(0))));
+
+        // 4. User wants to update Customer
+        String jsonMergePatchUpdate = """
+                {
+                "firstName": "John - updated",
+                "lastName": "Doe - updated"
+                }
+                """.trim();
+        mockMvc.perform(MockMvcRequestBuilders.patch("/customers/{id}",customerDto.id())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMergePatchUpdate))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 }

@@ -1,5 +1,6 @@
 package pl.dk.libraryapp.customer;
 
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +43,11 @@ class CustomerController {
             @RequestParam(required = false, defaultValue = PAGE_SIZE_DEFAULT) int size) {
         List<CustomerDto> allCustomers = customerService.findAllCustomers(page, size);
         return ResponseEntity.ok(allCustomers);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable String id, @RequestBody JsonMergePatch jsonMergePatch) {
+        customerService.updateCustomer(id, jsonMergePatch);
+        return ResponseEntity.noContent().build();
     }
 }
