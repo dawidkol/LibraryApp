@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-interface BookRepository extends MongoRepository<Book, String> {
+public interface BookRepository extends MongoRepository<Book, String> {
 
     int countAllByTitleAndAuthorAndPublisher(String title, String author, String publisher);
     Optional<Book> findBookByIsbn(String isbn);

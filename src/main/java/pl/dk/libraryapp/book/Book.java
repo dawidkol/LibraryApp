@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Document(value = "books")
 @Builder
-record Book(
+public record Book(
         @MongoId
         String id,
         @NotBlank

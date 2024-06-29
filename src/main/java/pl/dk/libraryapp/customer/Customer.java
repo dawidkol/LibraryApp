@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@Document(value = "books")
+@Document(value = "customers")
 @Builder
-record Customer(
+public record Customer(
         @MongoId
         String id,
         @NotBlank

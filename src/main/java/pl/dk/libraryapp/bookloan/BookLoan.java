@@ -1,0 +1,31 @@
+package pl.dk.libraryapp.bookloan;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.MongoId;
+import org.springframework.data.mongodb.repository.Update;
+import pl.dk.libraryapp.book.Book;
+import pl.dk.libraryapp.customer.Customer;
+
+import java.time.LocalDateTime;
+
+@Document(value = "bookLoans")
+@Builder
+record BookLoan(
+        @MongoId
+        String id,
+        @NotBlank
+        LocalDateTime borrowedAt,
+        @NotBlank
+        LocalDateTime returnedAt,
+        @DocumentReference
+        @NotBlank
+        Book book,
+        @DocumentReference
+        @NotBlank
+        Customer customer
+) {
+
+}
