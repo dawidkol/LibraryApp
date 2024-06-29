@@ -8,3 +8,6 @@ spring:
       port: 27017
       host: localhost
       authentication-database: admin
+server:
+  error:
+    include-message: always
