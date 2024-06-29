@@ -50,4 +50,10 @@ class CustomerController {
         customerService.updateCustomer(id, jsonMergePatch);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable String id) {
+        customerService.deleteCustomerById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

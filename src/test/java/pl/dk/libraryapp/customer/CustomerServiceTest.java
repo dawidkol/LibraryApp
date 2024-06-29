@@ -213,4 +213,52 @@ class CustomerServiceTest {
                 () -> assertEquals("Doe - updated", customerArgumentCaptor.getValue().lastName())
         );
     }
+
+    @Test
+    @DisplayName("It should delete customer by given Id")
+    void itShouldDeleteCustomerByGivenId() {
+        // Given
+        String customerId = "1";
+
+        Customer customer = Customer.builder()
+                .id("1")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@test.pl")
+                .build();
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        ArgumentCaptor<Customer> customerArgumentCaptor = ArgumentCaptor.forClass(Customer.class);
+
+        // When
+        underTest.deleteCustomerById(customerId);
+
+        // Then
+        assertAll(
+                () -> verify(customerRepository, times(1)).findById(customerId),
+                () -> verify(customerRepository, times(1)).delete(customerArgumentCaptor.capture())
+        );
+    }
+
+    @Test
+    @DisplayName("It should throw CustomerNotFoundException when user tries to delete Customer with non existing Id")
+    void itShouldThrowCustomerNotFoundExceptionWhenUserTriesToDeleteCustomerWithNonExistingId() {
+        // Given
+        String customerId = "1";
+
+        Customer customer = Customer.builder()
+                .id("1")
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@test.pl")
+                .build();
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertAll(
+                () -> assertThrows(CustomerNotFoundException.class, () -> underTest.deleteCustomerById(customerId)),
+                () -> verify(customerRepository, times(1)).findById(customerId)
+        );
+    }
 }

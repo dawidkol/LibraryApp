@@ -80,5 +80,9 @@ class CustomerControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonMergePatchUpdate))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        // 5. User wants to delete Customer
+        mockMvc.perform(MockMvcRequestBuilders.delete("/customers/{id}", customerDto.id()))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 }

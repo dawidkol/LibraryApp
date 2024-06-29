@@ -66,4 +66,12 @@ class CustomerService {
         JsonNode apply = jsonMergePatch.apply(jsonNode);
         return objectMapper.treeToValue(apply, CustomerDto.class);
     }
+
+    @Transactional
+    public void deleteCustomerById(String id) {
+        customerRepository.findById(id)
+                .ifPresentOrElse(customerRepository::delete, () -> {
+                    throw new CustomerNotFoundException("Customer with id %s not found".formatted(id));
+                });
+    }
 }
