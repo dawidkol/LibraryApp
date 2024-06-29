@@ -13,10 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.dk.libraryapp.TestcontainersConfiguration;
-import pl.dk.libraryapp.book.Book;
-import pl.dk.libraryapp.customer.Customer;
+import pl.dk.libraryapp.book.dtos.BookDto;
+import pl.dk.libraryapp.bookloan.dtos.BookLoanDto;
+import pl.dk.libraryapp.customer.dtos.CustomerDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,7 +50,7 @@ class BookLoanControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Customer customer = objectMapper.readValue(customerAsString, Customer.class);
+        CustomerDto customerDto = objectMapper.readValue(customerAsString, CustomerDto.class);
 
         // 2. User add book
         String bookJson = """
@@ -70,7 +70,7 @@ class BookLoanControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        Book book = objectMapper.readValue(bookAsString, Book.class);
+        BookDto bookDto = objectMapper.readValue(bookAsString, BookDto.class);
 
         // 3. User wants to borrow book
         String borrowBookJson = """
@@ -78,7 +78,7 @@ class BookLoanControllerTest {
                     "customerId": "%s",
                     "bookId": "%s"
                 }
-                """.trim().formatted(customer.id(), book.id());
+                """.trim().formatted(customerDto.id(), bookDto.id());
 
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/borrowBook")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -90,6 +90,12 @@ class BookLoanControllerTest {
         String location = response.getHeader("Location");
         assertNotNull(location);
 
+        // 4. User wants to return book
+        String bookLoanAsString = response.getContentAsString();
+        BookLoanDto bookLoanDto = objectMapper.readValue(bookLoanAsString, BookLoanDto.class);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/borrowBook/{id}", bookLoanDto.id()))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
 

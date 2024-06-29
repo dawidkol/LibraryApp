@@ -3,10 +3,7 @@ package pl.dk.libraryapp.bookloan;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.dk.libraryapp.bookloan.dtos.BookLoanDto;
 import pl.dk.libraryapp.bookloan.dtos.SaveBookLoanDto;
@@ -28,6 +25,12 @@ class BookLoanController {
                 .buildAndExpand(bookLoanDto.id())
                 .toUri();
         return ResponseEntity.created(uri).body(bookLoanDto);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> returnBook(@PathVariable String id) {
+        bookLoanService.setBookLoanReturnedTime(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

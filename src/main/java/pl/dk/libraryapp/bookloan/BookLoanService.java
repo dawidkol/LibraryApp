@@ -6,4 +6,6 @@ import pl.dk.libraryapp.bookloan.dtos.SaveBookLoanDto;
 public interface BookLoanService {
 
     BookLoanDto saveBookLoan(SaveBookLoanDto saveBookLoanDto);
+
+    void setBookLoanReturnedTime(String id);
 }

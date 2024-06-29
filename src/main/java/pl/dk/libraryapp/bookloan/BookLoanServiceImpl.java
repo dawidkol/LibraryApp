@@ -9,6 +9,8 @@ import pl.dk.libraryapp.bookloan.dtos.BookLoanDto;
 import pl.dk.libraryapp.bookloan.dtos.SaveBookLoanDto;
 import pl.dk.libraryapp.customer.Customer;
 import pl.dk.libraryapp.customer.CustomerRepository;
+import pl.dk.libraryapp.exceptions.BookHasAlreadyBeenReturnedException;
+import pl.dk.libraryapp.exceptions.BookLoanNotFoundException;
 import pl.dk.libraryapp.exceptions.BookNotFoundException;
 import pl.dk.libraryapp.exceptions.CustomerNotFoundException;
 
@@ -53,6 +55,28 @@ class BookLoanServiceImpl implements BookLoanService {
                 .returnedAt(bookLoan.returnedAt())
                 .customerId(bookLoan.customer().id())
                 .bookId(bookLoan.book().id())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void setBookLoanReturnedTime(String id) {
+        BookLoan bookLoan = bookLoanRepository.findById(id)
+                .orElseThrow(() -> new BookLoanNotFoundException("Book loan with id %s not found"));
+        if (bookLoan.returnedAt() != null) {
+            throw new BookHasAlreadyBeenReturnedException("Book with id %s has already been returned".formatted(id));
+        }
+        BookLoan bookLoanToUpdate = createBookLoanUpdateRecord(bookLoan);
+        bookLoanRepository.save(bookLoanToUpdate);
+    }
+
+    private BookLoan createBookLoanUpdateRecord(BookLoan bookLoan) {
+        return BookLoan.builder()
+                .id(bookLoan.id())
+                .borrowedAt(bookLoan.borrowedAt())
+                .returnedAt(LocalDateTime.now())
+                .customer(bookLoan.customer())
+                .book(bookLoan.book())
                 .build();
     }
 }

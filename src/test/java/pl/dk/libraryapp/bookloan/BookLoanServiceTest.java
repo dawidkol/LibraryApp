@@ -2,7 +2,9 @@ package pl.dk.libraryapp.bookloan;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pl.dk.libraryapp.book.Book;
@@ -42,6 +44,7 @@ class BookLoanServiceTest {
     }
 
     @Test
+    @DisplayName("It should save book loan")
     void itShouldSaveBookLoan() {
         // Given
         SaveBookLoanDto saveBookLoanDto = SaveBookLoanDto.builder()
@@ -79,6 +82,38 @@ class BookLoanServiceTest {
                 () -> assertNull(result.returnedAt()),
                 () -> assertEquals(saveBookLoanDto.bookId(), result.bookId()),
                 () -> assertEquals(saveBookLoanDto.customerId(), result.customerId())
+        );
+    }
+
+    @Test
+    @DisplayName("It should set book loan returned date")
+    void itShouldSetBookLoanReturnedDate() {
+        // Given
+        String bookLoanId = "1";
+
+        Customer customer = Customer.builder()
+                .id("1").build();
+        Book book = Book.builder()
+                .id("1").build();
+
+        BookLoan bookLoan = BookLoan.builder()
+                .id("1")
+                .borrowedAt(LocalDateTime.now())
+                .book(book)
+                .customer(customer)
+                .build();
+
+        when(bookLoanRepository.findById(bookLoanId)).thenReturn(Optional.of(bookLoan));
+
+        // When
+        underTest.setBookLoanReturnedTime(bookLoanId);
+
+        // Then
+        ArgumentCaptor<BookLoan> bookLoanArgumentCaptor = ArgumentCaptor.forClass(BookLoan.class);
+        assertAll(
+                () -> verify(bookLoanRepository, times(1)).findById(bookLoanId),
+                () -> verify(bookLoanRepository, times(1)).save(bookLoanArgumentCaptor.capture()),
+                () -> assertNotNull(bookLoanArgumentCaptor.getValue().returnedAt())
         );
     }
 }
