@@ -218,8 +218,7 @@ class BookServiceTest {
         // Then
         assertAll(
                 () -> verify(bookRepository, times(1)).findAll(pageRequest),
-                () -> assertEquals(books.size(), pageImpl.getTotalElements()),
-                () -> assertEquals(page, pageImpl.getTotalPages())
+               () -> assertEquals(1, allBooks.size())
         );
     }
 }

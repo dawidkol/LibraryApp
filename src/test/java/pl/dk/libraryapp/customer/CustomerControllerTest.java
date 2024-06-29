@@ -1,6 +1,7 @@
 package pl.dk.libraryapp.customer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.dk.libraryapp.TestcontainersConfiguration;
+import pl.dk.libraryapp.customer.dtos.CustomerDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,5 +53,18 @@ class CustomerControllerTest {
         MockHttpServletResponse response = resultActions.andReturn().getResponse();
         String location = response.getHeader("Location");
         assertNotNull(location);
+
+        // 2. User wants to retrieve Customer
+        String contentAsString = response.getContentAsString();
+        CustomerDto customerDto = objectMapper.readValue(contentAsString, CustomerDto.class);
+        mockMvc.perform(MockMvcRequestBuilders.get("/customers/{id}", customerDto.id()))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+
+        // 3. User wants to retrieve all Customers
+        mockMvc.perform(MockMvcRequestBuilders.get("/customers"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(Matchers.greaterThan(0))));
     }
 }
