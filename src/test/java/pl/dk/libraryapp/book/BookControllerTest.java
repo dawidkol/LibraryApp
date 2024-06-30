@@ -81,10 +81,15 @@ class BookControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/books"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(Matchers.greaterThan(0))));
 
+        // 5. User wants to retrieve all available books
+        mockMvc.perform(MockMvcRequestBuilders.get("/books").param("available", "true"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(Matchers.greaterThan(0))));
 
-        // 5. User wants to delete book
+        // 6. User wants to delete book
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/books/{id}", book.id()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());

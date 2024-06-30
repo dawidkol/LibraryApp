@@ -6,11 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import lombok.AllArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dk.libraryapp.book.dtos.BookDto;
-import pl.dk.libraryapp.book.dtos.BookInventoryDto;
 import pl.dk.libraryapp.exceptions.BookNotFoundException;
 import pl.dk.libraryapp.exceptions.ServerException;
 
@@ -66,26 +67,11 @@ class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookInventoryDto> findAllBooks(int page, int size) {
+    public List<BookDto> findAllBooks(int page, int size) {
         return bookRepository.findAll(PageRequest.of(--page, size))
                 .stream()
-                .map(this::mapToBookInventoryDto)
+                .map(BookDtoMapper::map)
                 .toList();
-    }
-
-    private BookInventoryDto mapToBookInventoryDto(Book book) {
-        int bookQuantity = bookRepository.countAllByTitleAndAuthorAndPublisher(
-                book.title(),
-                book.author(),
-                book.publisher());
-
-        return BookInventoryDto.builder()
-                .id(book.id())
-                .title(book.title())
-                .author(book.author())
-                .publisher(book.publisher())
-                .quantity(bookQuantity)
-                .build();
     }
 
     @Override
@@ -93,6 +79,32 @@ class BookServiceImpl implements BookService {
         return bookRepository.findBookByIsbn(isbn)
                 .map(BookDtoMapper::map)
                 .orElseThrow(() -> new BookNotFoundException("Book with ISBN = %s not found".formatted(isbn)));
+    }
+
+    @Override
+    @EventListener
+    @Async
+    @Transactional
+    public void setBookAvailability(UpdateBookAvailabilityEvent event) {
+        Book book = bookRepository.findById(event.bookId())
+                .orElseThrow(() -> new BookNotFoundException("Book with id = %s not found".formatted(event.bookId())));
+        Book updatedBook = Book.builder()
+                .id(book.id())
+                .title(book.title())
+                .author(book.author())
+                .publisher(book.publisher())
+                .isbn(book.isbn())
+                .available(event.availability())
+                .build();
+        bookRepository.save(updatedBook);
+    }
+
+    @Override
+    public List<BookDto> findAllAvailableBooks(int pageNumber, int pageSize) {
+        return bookRepository.findAllByAvailableIsTrue(PageRequest.of(--pageNumber, pageSize))
+                .stream()
+                .map(BookDtoMapper::map)
+                .toList();
     }
 
 }

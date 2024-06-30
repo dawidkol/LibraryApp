@@ -9,7 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.dk.libraryapp.book.dtos.BookDto;
-import pl.dk.libraryapp.book.dtos.BookInventoryDto;
 
 import java.net.URI;
 import java.util.List;
@@ -55,10 +54,16 @@ class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookInventoryDto>> getAllBooks(
+    public ResponseEntity<List<BookDto>> getAllBooks(
             @RequestParam(required = false, defaultValue = PAGE_DEFAULT) @Positive int page,
-            @RequestParam(required = false, defaultValue = PAGE_SIZE_DEFAULT) @Positive int size) {
-        List<BookInventoryDto> allBooks = bookService.findAllBooks(page, size);
+            @RequestParam(required = false, defaultValue = PAGE_SIZE_DEFAULT) @Positive int size,
+            @RequestParam(required = false, defaultValue = "false") Boolean available) {
+        List<BookDto> allBooks;
+        if (available.equals(true)) {
+            allBooks = bookService.findAllAvailableBooks(page, size);
+        } else {
+            allBooks = bookService.findAllBooks(page, size);
+        }
         return ResponseEntity.ok(allBooks);
     }
 }

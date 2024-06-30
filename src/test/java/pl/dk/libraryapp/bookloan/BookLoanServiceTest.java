@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.ApplicationEventPublisher;
 import pl.dk.libraryapp.book.Book;
 import pl.dk.libraryapp.book.BookRepository;
+import pl.dk.libraryapp.book.UpdateBookAvailabilityEvent;
 import pl.dk.libraryapp.bookloan.dtos.BookLoanDto;
 import pl.dk.libraryapp.bookloan.dtos.SaveBookLoanDto;
 import pl.dk.libraryapp.customer.Customer;
@@ -30,13 +32,15 @@ class BookLoanServiceTest {
     private CustomerRepository customerRepository;
     @Mock
     private BookRepository bookRepository;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
     private AutoCloseable autoCloseable;
     private BookLoanService underTest;
 
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        underTest = new BookLoanServiceImpl(bookLoanRepository, bookRepository, customerRepository);
+        underTest = new BookLoanServiceImpl(bookLoanRepository, bookRepository, customerRepository, applicationEventPublisher);
     }
 
     @AfterEach
@@ -57,7 +61,9 @@ class BookLoanServiceTest {
         Customer customer = Customer.builder()
                 .id("1").build();
         Book book = Book.builder()
-                .id("1").build();
+                .id("1")
+                .available(true)
+                .build();
 
         BookLoan bookLoan = BookLoan.builder()
                 .id("1")
@@ -65,6 +71,7 @@ class BookLoanServiceTest {
                 .book(book)
                 .customer(customer)
                 .build();
+
 
         when(customerRepository.findById("1")).thenReturn(Optional.of(customer));
         when(bookRepository.findById("1")).thenReturn(Optional.of(book));
@@ -104,7 +111,17 @@ class BookLoanServiceTest {
                 .customer(customer)
                 .build();
 
+        BookLoan bookLoanWithReturnedTime = BookLoan.builder()
+                .id("1")
+                .borrowedAt(LocalDateTime.now())
+                .returnedAt(LocalDateTime.now())
+                .book(book)
+                .customer(customer)
+                .build();
+
         when(bookLoanRepository.findById(bookLoanId)).thenReturn(Optional.of(bookLoan));
+        when(bookLoanRepository.save(any())).thenReturn(bookLoanWithReturnedTime);
+        doNothing().when(applicationEventPublisher).publishEvent(new UpdateBookAvailabilityEvent(bookLoanWithReturnedTime.book().id(), true));
 
         // When
         underTest.setBookLoanReturnedTime(bookLoanId);
@@ -149,6 +166,5 @@ class BookLoanServiceTest {
                 () -> assertEquals(1, result.size())
         );
     }
-
 
 }

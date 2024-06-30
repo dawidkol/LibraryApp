@@ -2,7 +2,6 @@ package pl.dk.libraryapp.book;
 
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import pl.dk.libraryapp.book.dtos.BookDto;
-import pl.dk.libraryapp.book.dtos.BookInventoryDto;
 
 import java.util.List;
 
@@ -16,7 +15,11 @@ public interface BookService {
 
     void deleteBookById(String id);
 
-    List<BookInventoryDto> findAllBooks(int page, int size);
+    List<BookDto> findAllBooks(int page, int size);
 
     BookDto findBookByISBN(String isbn);
+
+    void setBookAvailability(UpdateBookAvailabilityEvent event);
+
+    List<BookDto> findAllAvailableBooks(int pageNumber, int pageSize);
 }

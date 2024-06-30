@@ -13,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import pl.dk.libraryapp.book.dtos.BookDto;
-import pl.dk.libraryapp.book.dtos.BookInventoryDto;
 import pl.dk.libraryapp.exceptions.BookNotFoundException;
 
 import java.util.List;
@@ -43,7 +42,6 @@ class BookServiceTest {
         autoCloseable.close();
     }
 
-
     @Test
     @DisplayName("It should save book in database")
     void itShouldSaveBookInDatabase() {
@@ -53,6 +51,7 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn("978-1-56619-909-4")
+                .available(true)
                 .build();
 
         Book book = Book.builder()
@@ -60,6 +59,7 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn("978-1-56619-909-4")
+                .available(true)
                 .build();
 
         Book bookWithId = Book.builder()
@@ -68,9 +68,10 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn("978-1-56619-909-4")
+                .available(true)
                 .build();
 
-        when(bookRepository.save(book)).thenReturn(bookWithId);
+        when(bookRepository.save(any())).thenReturn(bookWithId);
 
         // When
         BookDto bookDto = underTest.saveBook(dto);
@@ -82,6 +83,7 @@ class BookServiceTest {
                 () -> assertEquals(dto.author(), bookDto.author()),
                 () -> assertEquals(dto.publisher(), bookDto.publisher()),
                 () -> assertEquals(dto.author(), bookDto.author()),
+                () -> assertEquals(dto.available(), bookDto.available()),
                 () -> verify(bookRepository, times(1)).save(book)
         );
     }
@@ -98,6 +100,7 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn("978-1-56619-909-4")
+                .available(true)
                 .build();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
@@ -112,6 +115,7 @@ class BookServiceTest {
                 () -> assertEquals(book.author(), bookById.author()),
                 () -> assertEquals(book.publisher(), bookById.publisher()),
                 () -> assertEquals(book.isbn(), bookById.isbn()),
+                () -> assertEquals(book.available(), bookById.available()),
                 () -> verify(bookRepository, times(1)).findById(bookId)
         );
     }
@@ -128,6 +132,7 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn("978-1-56619-909-4")
+                .available(true)
                 .build();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
@@ -167,6 +172,7 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn("978-1-56619-909-4")
+                .available(true)
                 .build();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
@@ -207,6 +213,7 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn("978-1-56619-909-4")
+                .available(true)
                 .build();
         List<Book> books = List.of(book);
         PageImpl<Book> pageImpl = new PageImpl<>(books);
@@ -214,12 +221,12 @@ class BookServiceTest {
         when(bookRepository.findAll(pageRequest)).thenReturn(pageImpl);
 
         // When
-        List<BookInventoryDto> allBooks = underTest.findAllBooks(page, size);
+        List<BookDto> allBooks = underTest.findAllBooks(page, size);
 
         // Then
         assertAll(
                 () -> verify(bookRepository, times(1)).findAll(pageRequest),
-               () -> assertEquals(1, allBooks.size())
+                () -> assertEquals(1, allBooks.size())
         );
     }
 
@@ -235,6 +242,7 @@ class BookServiceTest {
                 .author("Joshua Bloch")
                 .publisher("Addison-Wesley")
                 .isbn(ISBN)
+                .available(true)
                 .build();
 
         when(bookRepository.findBookByIsbn(ISBN)).thenReturn(Optional.of(book));
@@ -249,7 +257,8 @@ class BookServiceTest {
                 () -> assertEquals(book.title(), result.title()),
                 () -> assertEquals(book.author(), result.author()),
                 () -> assertEquals(book.publisher(), result.publisher()),
-                () -> assertEquals(book.isbn(), result.isbn())
+                () -> assertEquals(book.isbn(), result.isbn()),
+                () -> assertEquals(book.available(), result.available())
         );
     }
 
@@ -265,6 +274,37 @@ class BookServiceTest {
         assertAll(
                 () -> assertThrows(BookNotFoundException.class, () -> underTest.findBookByISBN(ISBN)),
                 () -> verify(bookRepository, times(1)).findBookByIsbn(ISBN)
+        );
+    }
+
+    @Test
+    @DisplayName(("It should find all available books"))
+    void itShouldFindAllAvailableBooks() {
+        // Given
+        int pageNumber = 1;
+        int pageSize = 25;
+
+        Book book = Book.builder()
+                .id("1")
+                .title("Effective Java")
+                .author("Joshua Bloch")
+                .publisher("Addison-Wesley")
+                .isbn("978-1-56619-909-4")
+                .available(true)
+                .build();
+
+        List<Book> books = List.of(book);
+        PageImpl<Book> page = new PageImpl<>(books);
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+
+        when(bookRepository.findAllByAvailableIsTrue(pageRequest)).thenReturn(page);
+
+        // When
+        List<BookDto> allAvailableBooks = underTest.findAllAvailableBooks(pageNumber, pageSize);
+
+        // Then
+        assertAll(
+                () -> assertEquals(1, allAvailableBooks.size())
         );
     }
 

@@ -20,6 +20,7 @@ public record Book(
         String publisher,
         @ISBN
         @Indexed(unique = true)
-        String isbn
+        String isbn,
+        Boolean available
 ) {
 }
