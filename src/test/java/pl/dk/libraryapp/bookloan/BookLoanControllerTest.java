@@ -39,7 +39,7 @@ class BookLoanControllerTest {
                 {
                     "firstName": "John",
                     "lastName": "Doe",
-                    "email": "john.doe@test.pl"
+                    "email": "johndoe@test.pl"
                 }
                 """.trim();
 
@@ -58,7 +58,7 @@ class BookLoanControllerTest {
                     "title": "Effective Java",
                     "author": "Joshua Bloch",
                     "publisher": "Addison-Wesley",
-                    "isbn": "978-1-56619-909-4"
+                    "isbn": "978-3-16-148410-0"
                 }
                 """.trim();
 
@@ -80,7 +80,7 @@ class BookLoanControllerTest {
                 }
                 """.trim().formatted(customerDto.id(), bookDto.id());
 
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/borrowBook")
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/borrow")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(borrowBookJson))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -94,9 +94,12 @@ class BookLoanControllerTest {
         String bookLoanAsString = response.getContentAsString();
         BookLoanDto bookLoanDto = objectMapper.readValue(bookLoanAsString, BookLoanDto.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/borrowBook/{id}", bookLoanDto.id()))
+        mockMvc.perform(MockMvcRequestBuilders.patch("/borrow/{id}", bookLoanDto.id()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
 
+        // 5. User want to retrieve users book loans history
+        mockMvc.perform(MockMvcRequestBuilders.get("/borrow/{id}/history", customerDto.id()))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
 }

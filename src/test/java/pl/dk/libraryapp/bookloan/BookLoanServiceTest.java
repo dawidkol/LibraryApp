@@ -15,6 +15,7 @@ import pl.dk.libraryapp.customer.Customer;
 import pl.dk.libraryapp.customer.CustomerRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -116,4 +117,38 @@ class BookLoanServiceTest {
                 () -> assertNotNull(bookLoanArgumentCaptor.getValue().returnedAt())
         );
     }
+
+    @Test
+    @DisplayName("It should retrieve Customers book loan history")
+    void itShouldRetrieveCustomersBookLoanHistory() {
+        // Given
+        String customerId = "1";
+        int pageNumber = 1;
+        int pageSize = 1;
+
+        Customer customer = Customer.builder()
+                .id("1").build();
+        Book book = Book.builder()
+                .id("1").build();
+
+        BookLoan bookLoan = BookLoan.builder()
+                .id("2")
+                .borrowedAt(LocalDateTime.now().minusDays(1))
+                .returnedAt(LocalDateTime.now())
+                .book(book)
+                .customer(customer)
+                .build();
+
+        when(bookLoanRepository.findAllByCustomer_Id(customerId)).thenReturn(List.of(bookLoan));
+
+        // When
+        List<BookLoanDto> result = underTest.findCustomerBookLoans(customerId, pageNumber, pageSize);
+
+        // Then
+        assertAll(
+                () -> assertEquals(1, result.size())
+        );
+    }
+
+
 }

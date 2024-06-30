@@ -2,6 +2,8 @@ package pl.dk.libraryapp.bookloan;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
+import org.springframework.data.annotation.ReadOnlyProperty;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.MongoId;
@@ -20,10 +22,10 @@ record BookLoan(
         LocalDateTime borrowedAt,
         @NotBlank
         LocalDateTime returnedAt,
-        @DocumentReference
+        @DBRef
         @NotBlank
         Book book,
-        @DocumentReference
+        @DBRef
         @NotBlank
         Customer customer
 ) {

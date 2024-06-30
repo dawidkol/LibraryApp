@@ -9,12 +9,10 @@ import pl.dk.libraryapp.bookloan.dtos.BookLoanDto;
 import pl.dk.libraryapp.bookloan.dtos.SaveBookLoanDto;
 import pl.dk.libraryapp.customer.Customer;
 import pl.dk.libraryapp.customer.CustomerRepository;
-import pl.dk.libraryapp.exceptions.BookHasAlreadyBeenReturnedException;
-import pl.dk.libraryapp.exceptions.BookLoanNotFoundException;
-import pl.dk.libraryapp.exceptions.BookNotFoundException;
-import pl.dk.libraryapp.exceptions.CustomerNotFoundException;
+import pl.dk.libraryapp.exceptions.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -27,6 +25,11 @@ class BookLoanServiceImpl implements BookLoanService {
     @Override
     @Transactional
     public BookLoanDto saveBookLoan(SaveBookLoanDto saveBookLoanDto) {
+        bookLoanRepository.findByBook_Id(saveBookLoanDto.bookId()).ifPresent(
+                bookLoan -> {
+                    throw new BookBorrowedException("Book with id %s has already been borrowed");
+                }
+        );
         BookLoan bookToSave = this.map(saveBookLoanDto);
         BookLoan savedBook = bookLoanRepository.save(bookToSave);
         return this.map(savedBook);
@@ -79,4 +82,14 @@ class BookLoanServiceImpl implements BookLoanService {
                 .book(bookLoan.book())
                 .build();
     }
+
+    @Override
+    public List<BookLoanDto> findCustomerBookLoans(String customerId, int pageNumber, int pageSize) {
+        List<BookLoan> allByCustomerId = bookLoanRepository.findAllByCustomer_Id(customerId);
+        return bookLoanRepository.findAllByCustomer_Id(customerId)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
 }
