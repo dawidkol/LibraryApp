@@ -7,6 +7,7 @@ for book and customer management, as well as book borrowing and returning proces
 ```http request
 GET http://localhost:8080/swagger-ui/index.html
 ```
+<img width="1340" alt="Screenshot 2024-07-01 at 20 43 21" src="https://github.com/dawidkol/LibraryApp/assets/15035709/a5af6ca6-8c3a-40cd-a7a8-6dd60b891fa9">
 
 ## Features
 
