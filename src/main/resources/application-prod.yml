@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  data:
+    mongodb:
+      database: library
+      auto-index-creation: true
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
+      port: 27017
+      host: localhost
+      authentication-database: admin
+
+  docker:
+    compose:
+      enabled: true
