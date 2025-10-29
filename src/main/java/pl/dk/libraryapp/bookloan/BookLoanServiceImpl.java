@@ -15,7 +15,6 @@ import pl.dk.libraryapp.exceptions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor

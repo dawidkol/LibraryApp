@@ -18,12 +18,11 @@ import pl.dk.libraryapp.book.dtos.BookDto;
 import pl.dk.libraryapp.bookloan.dtos.BookLoanDto;
 import pl.dk.libraryapp.customer.dtos.CustomerDto;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Import(TestcontainersConfiguration.class)
 @SpringBootTest
+@Import(TestcontainersConfiguration.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class BookLoanControllerTest {
 
     @Autowired

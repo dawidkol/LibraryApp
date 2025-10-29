@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -18,14 +17,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import pl.dk.libraryapp.TestcontainersConfiguration;
 import pl.dk.libraryapp.customer.dtos.CustomerDto;
 
-import java.util.Locale;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@Import(TestcontainersConfiguration.class)
 @SpringBootTest
+@Import(TestcontainersConfiguration.class)
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class CustomerControllerTest {
 
     @Autowired

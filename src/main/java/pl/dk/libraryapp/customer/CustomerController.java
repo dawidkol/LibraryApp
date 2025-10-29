@@ -11,7 +11,7 @@ import pl.dk.libraryapp.customer.dtos.CustomerDto;
 import java.net.URI;
 import java.util.List;
 
-import static pl.dk.libraryapp.constants.PaginationConstants.*;
+import static pl.dk.libraryapp.constants.PaginationConstants.PAGE_DEFAULT;
 import static pl.dk.libraryapp.constants.PaginationConstants.PAGE_SIZE_DEFAULT;
 
 @RestController

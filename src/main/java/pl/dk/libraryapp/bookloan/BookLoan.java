@@ -2,12 +2,9 @@ package pl.dk.libraryapp.bookloan;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
-import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 import org.springframework.data.mongodb.core.mapping.MongoId;
-import org.springframework.data.mongodb.repository.Update;
 import pl.dk.libraryapp.book.Book;
 import pl.dk.libraryapp.customer.Customer;
 

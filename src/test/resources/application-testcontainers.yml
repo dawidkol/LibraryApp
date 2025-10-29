@@ -1,0 +1,8 @@
+spring:
+  config:
+    activate:
+      on-profile: testcontainers
+
+  autoconfigure:
+    exclude:
+      - de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
-@Profile("dev")
+@Profile({"dev"})
 @ConditionalOnClass(MongoAutoConfiguration.class)
 @Slf4j
 class EmbeddedMongoConfig {
