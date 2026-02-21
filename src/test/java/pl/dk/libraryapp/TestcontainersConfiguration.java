@@ -8,7 +8,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-@Profile("testcontainers")
+@Profile("prod")
 public class TestcontainersConfiguration {
 
     @Bean
