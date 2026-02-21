@@ -16,3 +16,7 @@ spring:
   docker:
     compose:
       enabled: true
+
+  autoconfigure:
+    exclude:
+      - de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration
