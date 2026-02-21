@@ -51,7 +51,7 @@ GET http://localhost:8080/swagger-ui/index.html
 
 ## Requirements
 
-- Java 22
+- Java 21
 - Maven
 - Docker (for Testcontainers and MongoDB integration)
 
@@ -61,7 +61,7 @@ GET http://localhost:8080/swagger-ui/index.html
 
 Ensure you have the following installed on your local machine:
 
-- Java 22
+- Java 21
 - Maven
 - Docker
 
@@ -74,13 +74,18 @@ Ensure you have the following installed on your local machine:
 git clone https://github.com/dawidkol/LibraryApp.git
 cd LibraryApp
 ```
-
 2. Build the project
 ```bash
-mvc clean install
+mvn clean install
 ```
-
+### -- DEV-MODE[EMBEDDED MONGO] --
 3. Run the application
 ```bash
 mvn spring-boot:run
+```
+### -- PROD-MODE[MONGO-MODE]-DOCKER REQUIRED -- 
+#### Remember to add your MongoDB username and password as environment variables in application.yml
+3. Run the application
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
