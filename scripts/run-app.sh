@@ -1,0 +1,1 @@
+docker run dkcodepro/libraryapp:latest
